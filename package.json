@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "convert": "ts-node src/convert.ts"
+    "convert": "ts-node src/convert.ts",
+    "analyze": "ts-node src/analyze.ts"
   },
   "author": "",
   "license": "ISC",
