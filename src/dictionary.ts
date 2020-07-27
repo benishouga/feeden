@@ -160,6 +160,10 @@ const pushIndex = (from: string, to: string) => {
   array.add(to);
 };
 
+export const getDictionary = () => {
+  return dictionary;
+};
+
 export const show = () => {
   dictionary.forEach((group, word) => {
     group.forEach((a) => {
