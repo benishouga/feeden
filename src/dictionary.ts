@@ -123,32 +123,29 @@ export const addRow = (row: string) => {
   const wordPart = row.slice(0, index).trim();
   const meaningPart = row.slice(index + 1).trim();
   const { word, group, type } = parseWorkdPart(wordPart);
-
-  if (word) {
-    const { text, tags, links, remarks, examples, additionals } = parseMeaningPart(meaningPart);
-    const meanings = getHolder(word);
-    meanings.push({ text, type, group, links, tags, examples, remarks, additionals });
-    pushIndex(word, word);
-    additionals.forEach((item) => {
-      if (item.type === "変化") {
-        item.value.split("、").forEach((parts) => {
-          const match = /(〈[^〉]+?〉|《[^》]+?》)+(?<value>.*)/.exec(parts);
-          if (match?.groups) {
-            const { value } = match.groups;
-            value
-              .split("|")
-              .map((v) => v.trim())
-              .forEach((v) => pushIndex(v, word));
-          }
-        });
-      } else if (item.type === "略" || item.type === "女性形") {
-        item.value
-          .split(";")
-          .map((v) => v.trim())
-          .forEach((v) => pushIndex(v, word));
-      }
-    });
-  }
+  const { text, tags, links, remarks, examples, additionals } = parseMeaningPart(meaningPart);
+  const meanings = getHolder(word);
+  meanings.push({ text, type, group, links, tags, examples, remarks, additionals });
+  pushIndex(word, word);
+  additionals.forEach((item) => {
+    if (item.type === "変化") {
+      item.value.split("、").forEach((parts) => {
+        const match = /(〈[^〉]+?〉|《[^》]+?》)+(?<value>.*)/.exec(parts);
+        if (match?.groups) {
+          const { value } = match.groups;
+          value
+            .split("|")
+            .map((v) => v.trim())
+            .forEach((v) => pushIndex(v, word));
+        }
+      });
+    } else if (item.type === "略" || item.type === "女性形") {
+      item.value
+        .split(";")
+        .map((v) => v.trim())
+        .forEach((v) => pushIndex(v, word));
+    }
+  });
 };
 
 const pushIndex = (from: string, to: string) => {
