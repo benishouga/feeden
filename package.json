@@ -25,7 +25,7 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.ts$": "ts-jest"
     },
     "coverageThreshold": {
       "global": {

@@ -164,6 +164,10 @@ export const getDictionary = () => {
   return dictionary;
 };
 
+export const getIndexes = () => {
+  return indexes;
+};
+
 export const show = () => {
   dictionary.forEach((group, word) => {
     group.forEach((a) => {

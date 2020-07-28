@@ -7,7 +7,7 @@ const pipeline = util.promisify(orgPipeline);
 import * as iconv from "iconv-lite";
 import ReadlineTransform from "readline-transform";
 
-import { addRow, getDictionary } from "./dictionary";
+import { addRow, getDictionary, getIndexes } from "./dictionary";
 
 const perline = new ReadlineTransform();
 
@@ -24,6 +24,8 @@ describe("Dictionary", () => {
       console.log("time: ", new Date().getTime() - start);
       const dic = getDictionary();
       expect(dic).toMatchSnapshot();
+      const indexes = getIndexes();
+      expect(indexes).toMatchSnapshot();
     }
     await run();
   });

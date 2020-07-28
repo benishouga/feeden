@@ -6236,3 +6236,474 @@ Map {
   ],
 }
 `;
+
+exports[`Dictionary Test using snapshot 2`] = `
+Map {
+  "-ish" => Set {
+    "-ish",
+  },
+  "agreeable" => Set {
+    "agreeable",
+  },
+  "airhead" => Set {
+    "airhead",
+  },
+  "amygdalo-" => Set {
+    "amygdalo-",
+  },
+  "and" => Set {
+    "and",
+  },
+  "Android phone" => Set {
+    "Android phone",
+  },
+  "angle" => Set {
+    "angle",
+  },
+  "angles" => Set {
+    "angle",
+  },
+  "angling" => Set {
+    "angle",
+  },
+  "angled" => Set {
+    "angle",
+  },
+  "arm" => Set {
+    "arm",
+  },
+  "arms" => Set {
+    "arm",
+  },
+  "arming" => Set {
+    "arm",
+  },
+  "armed" => Set {
+    "arm",
+  },
+  "automaton" => Set {
+    "automaton",
+  },
+  "automata" => Set {
+    "automaton",
+  },
+  "automatons" => Set {
+    "automaton",
+  },
+  "automaton clock" => Set {
+    "automaton clock",
+  },
+  "automaton diagram" => Set {
+    "automaton diagram",
+  },
+  "automaton identification" => Set {
+    "automaton identification",
+  },
+  "automaton learning" => Set {
+    "automaton learning",
+  },
+  "automaton method" => Set {
+    "automaton method",
+  },
+  "automaton network" => Set {
+    "automaton network",
+  },
+  "automaton structure" => Set {
+    "automaton structure",
+  },
+  "automaton theory" => Set {
+    "automaton theory",
+  },
+  "axis" => Set {
+    "axis",
+  },
+  "axes" => Set {
+    "axis",
+  },
+  "axises" => Set {
+    "axis",
+  },
+  "baith" => Set {
+    "baith",
+  },
+  "barre" => Set {
+    "barre",
+  },
+  "Barre" => Set {
+    "Barre",
+  },
+  "bass" => Set {
+    "bass",
+  },
+  "basses" => Set {
+    "bass",
+  },
+  "Bass" => Set {
+    "Bass",
+  },
+  "bell" => Set {
+    "bell",
+  },
+  "bells" => Set {
+    "bell",
+  },
+  "belling" => Set {
+    "bell",
+  },
+  "belled" => Set {
+    "bell",
+  },
+  "Bell" => Set {
+    "Bell",
+  },
+  "both" => Set {
+    "both",
+  },
+  "chautauqua" => Set {
+    "chautauqua",
+  },
+  "close" => Set {
+    "close",
+  },
+  "closer" => Set {
+    "close",
+  },
+  "closest" => Set {
+    "close",
+  },
+  "closes" => Set {
+    "close",
+  },
+  "closing" => Set {
+    "close",
+  },
+  "closed" => Set {
+    "close",
+  },
+  "content" => Set {
+    "content",
+  },
+  "contents" => Set {
+    "content",
+  },
+  "contenting" => Set {
+    "content",
+  },
+  "contented" => Set {
+    "content",
+  },
+  "Content" => Set {
+    "Content",
+  },
+  "dad" => Set {
+    "dad",
+  },
+  "dads" => Set {
+    "dad",
+  },
+  "detenu" => Set {
+    "detenu",
+  },
+  "detenue" => Set {
+    "detenu",
+  },
+  "ext." => Set {
+    "ext.",
+  },
+  "Facebook" => Set {
+    "Facebook",
+  },
+  "FB" => Set {
+    "Facebook",
+    "full-back",
+  },
+  "Facebook application" => Set {
+    "Facebook application",
+  },
+  "Facebook Connect" => Set {
+    "Facebook Connect",
+  },
+  "Facebook Developers Conference" => Set {
+    "Facebook Developers Conference",
+  },
+  "Facebook fan page" => Set {
+    "Facebook fan page",
+  },
+  "Facebook generation" => Set {
+    "Facebook generation",
+  },
+  "Facebook group" => Set {
+    "Facebook group",
+  },
+  "Facebook member" => Set {
+    "Facebook member",
+  },
+  "Facebook profile" => Set {
+    "Facebook profile",
+  },
+  "Facebook profile information" => Set {
+    "Facebook profile information",
+  },
+  "Facebook profile page" => Set {
+    "Facebook profile page",
+  },
+  "Facebook profile picture" => Set {
+    "Facebook profile picture",
+  },
+  "Facebook timeline page" => Set {
+    "Facebook timeline page",
+  },
+  "Facebook user" => Set {
+    "Facebook user",
+  },
+  "Facebookian" => Set {
+    "Facebookian",
+  },
+  "favorite" => Set {
+    "favorite",
+  },
+  "Fibonacci" => Set {
+    "Fibonacci",
+  },
+  "Fibonacci analyses" => Set {
+    "Fibonacci analyses",
+  },
+  "Fibonacci analysis" => Set {
+    "Fibonacci analysis",
+  },
+  "Fibonacci heap" => Set {
+    "Fibonacci heap",
+  },
+  "Fibonacci index" => Set {
+    "Fibonacci index",
+  },
+  "Fibonacci lattice" => Set {
+    "Fibonacci lattice",
+  },
+  "Fibonacci numbers" => Set {
+    "Fibonacci numbers",
+  },
+  "Fibonacci ratio" => Set {
+    "Fibonacci ratio",
+  },
+  "Fibonacci retracement" => Set {
+    "Fibonacci retracement",
+  },
+  "Fibonacci search" => Set {
+    "Fibonacci search",
+  },
+  "Fibonacci sequence" => Set {
+    "Fibonacci sequence",
+  },
+  "Fibonacci series" => Set {
+    "Fibonacci series",
+  },
+  "Fibonacci superlattice" => Set {
+    "Fibonacci superlattice",
+  },
+  "foreman" => Set {
+    "foreman",
+  },
+  "forewoman" => Set {
+    "foreman",
+  },
+  "forelady" => Set {
+    "foreman",
+  },
+  "foremen" => Set {
+    "foreman",
+  },
+  "full-back" => Set {
+    "full-back",
+  },
+  "fb" => Set {
+    "full-back",
+  },
+  "f.b." => Set {
+    "full-back",
+  },
+  "full-screen" => Set {
+    "full-screen",
+  },
+  "full-screen display" => Set {
+    "full-screen display",
+  },
+  "full-screen editor" => Set {
+    "full-screen editor",
+  },
+  "full-screen movie" => Set {
+    "full-screen movie",
+  },
+  "full-screen processing" => Set {
+    "full-screen processing",
+  },
+  "full-screen sized photo" => Set {
+    "full-screen sized photo",
+  },
+  "hepatitis" => Set {
+    "hepatitis",
+  },
+  "livedoor Co., Ltd." => Set {
+    "livedoor Co., Ltd.",
+  },
+  "needle" => Set {
+    "needle",
+  },
+  "needles" => Set {
+    "needle",
+  },
+  "needling" => Set {
+    "needle",
+  },
+  "needled" => Set {
+    "needle",
+  },
+  "negative" => Set {
+    "negative",
+  },
+  "negatives" => Set {
+    "negative",
+  },
+  "nitro" => Set {
+    "nitro",
+  },
+  "nitroglycerin" => Set {
+    "nitroglycerin",
+  },
+  "NTG" => Set {
+    "nitroglycerin",
+  },
+  "NG" => Set {
+    "nitroglycerin",
+  },
+  "nitromethane" => Set {
+    "nitromethane",
+  },
+  "Nitro" => Set {
+    "Nitro",
+  },
+  "nuclear" => Set {
+    "nuclear",
+  },
+  "nuclears" => Set {
+    "nuclear",
+  },
+  "nucleus" => Set {
+    "nucleus",
+  },
+  "nuclei" => Set {
+    "nucleus",
+  },
+  "nucleuses" => Set {
+    "nucleus",
+  },
+  "octopus" => Set {
+    "octopus",
+  },
+  "octopi" => Set {
+    "octopus",
+  },
+  "octopodes" => Set {
+    "octopus",
+  },
+  "OK" => Set {
+    "OK",
+  },
+  "on the move" => Set {
+    "on the move",
+  },
+  "one" => Set {
+    "one",
+  },
+  "ones" => Set {
+    "one",
+  },
+  "police inspector" => Set {
+    "police inspector",
+  },
+  "really" => Set {
+    "really",
+  },
+  "take" => Set {
+    "take",
+  },
+  "takes" => Set {
+    "take",
+  },
+  "taking" => Set {
+    "take",
+  },
+  "took" => Set {
+    "take",
+  },
+  "taken" => Set {
+    "take",
+  },
+  "fast friend" => Set {
+    "fast friend",
+  },
+  "sour on" => Set {
+    "sour on",
+  },
+  "string" => Set {
+    "string",
+  },
+  "strings" => Set {
+    "string",
+  },
+  "stringing" => Set {
+    "string",
+  },
+  "strung" => Set {
+    "string",
+  },
+  "study" => Set {
+    "study",
+  },
+  "studies" => Set {
+    "study",
+  },
+  "studying" => Set {
+    "study",
+  },
+  "studied" => Set {
+    "study",
+  },
+  "vivid" => Set {
+    "vivid",
+  },
+  "vivid and detailed image" => Set {
+    "vivid and detailed image",
+  },
+  "vivid biography" => Set {
+    "vivid biography",
+  },
+  "vivid color" => Set {
+    "vivid color",
+  },
+  "vivid color reproduction" => Set {
+    "vivid color reproduction",
+  },
+  "vivid colour" => Set {
+    "vivid colour",
+  },
+  "vivid colour reproduction" => Set {
+    "vivid colour reproduction",
+  },
+  "voice" => Set {
+    "voice",
+  },
+  "voices" => Set {
+    "voice",
+  },
+  "voicing" => Set {
+    "voice",
+  },
+  "voiced" => Set {
+    "voice",
+  },
+  "weak password" => Set {
+    "weak password",
+  },
+}
+`;
