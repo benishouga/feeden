@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "convert": "ts-node src/convert.ts",
+    "convert:debug": "node -r ts-node/register --inspect --inspect-brk src/convert.ts",
     "analyze": "ts-node src/analyze.ts",
     "test": "jest --coverage"
   },

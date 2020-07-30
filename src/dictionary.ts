@@ -1,3 +1,5 @@
+import { extract, extractRepeat } from "./regexp-util";
+
 export type Index = Map<string, Set<string>>;
 export type Dictionary = Map<string, Meaning[]>;
 
@@ -20,133 +22,90 @@ export interface Additional {
 const dictionary: Dictionary = new Map();
 const indexes: Index = new Map();
 
-const parseWorkdPart = (wordPart: string) => {
-  const match = /^(?<word>[^{]+)(\{\{?(?<group>\d*)-?(?<type>[^}]*?)(-\d+)?\}?\})?/.exec(wordPart);
-  if (match?.groups) {
-    const { word, group = "", type = "" } = match.groups;
-    return { word: word.trim(), group, type };
-  }
-  throw new Error("Failed to parse the word-part. " + wordPart);
-};
+function parseWorkdPart(wordPart: string) {
+  return extract(/^(?<word>[^{]+)(\{\{?(?<group>\d*)-?(?<type>[^}]*?)(-\d+)?\}?\})?/, wordPart);
+}
 
-const extractMeaning = (meaningPart: string) => {
-  const match = /^(?<text>[^■◆【]*)(?<otherParts>.*)/.exec(meaningPart);
-  if (match?.groups) {
-    return match.groups;
-  }
-  return {};
-};
+function extractMeaning(meaningPart: string) {
+  return extract(/^(?<text>[^■◆【]*)(?<otherParts>.*)/, meaningPart);
+}
 
-const extractOther = (other: string) => {
-  const results: { remarks: string[]; examples: string[]; additionals: Additional[] } = {
-    remarks: [],
-    examples: [],
+function extractOther(other: string) {
+  const extracted = extractRepeat(
+    /(?:◆(?<remarks>[^■◆【]+)|■・(?<examples>[^■◆【]+)|◆?(?<additionals>【[^■◆【]+))?/g,
+    other
+  );
+  const result: { remarks: string[]; examples: string[]; additionals: Additional[] } = {
+    remarks: extracted.remarks,
+    examples: extracted.examples,
     additionals: [],
   };
-  const reg = /(?:◆(?<remark>[^■◆【]+)|■・(?<example>[^■◆【]+)|◆?(?<additional>【[^■◆【]+))?/g;
-  let match;
-  while ((match = reg.exec(other))) {
-    if (!match[0]) {
-      break;
-    }
-    if (!match.groups) {
-      continue;
-    }
-    const { remark, example, additional } = match.groups;
-    remark && results.remarks.push(remark);
-    example && results.examples.push(example);
-    if (additional) {
-      const match = /【(?<type>[^】]+)】(?<value>.+?)、?$/.exec(additional);
-      if (match?.groups) {
-        const { type, value } = match?.groups;
-        results.additionals.push({ type, value });
-      }
-    }
-  }
-  return results;
-};
+  extracted.additionals?.forEach((additional: string) => {
+    const { type, value } = extract(/【(?<type>[^】]+)】(?<value>.+?)、?$/, additional);
+    if (type) result.additionals.push({ type, value });
+  });
+  return result;
+}
 
-const extractTags = (meaning: string) => {
-  const tags: string[] = [];
-  const reg = /(〈(?<tag>[^〉]+?)〉|《(?<label>[^》]+?)》)/g;
-  let match;
-  while ((match = reg.exec(meaning))) {
-    if (!match[0]) {
-      break;
-    }
-    if (!match.groups) {
-      continue;
-    }
-    const { tag, label } = match.groups;
-    tags.push(tag || label);
-  }
-  return tags;
-};
+function extractTags(meaning: string) {
+  const result = extractRepeat(/(〈(?<tag>[^〉]+?)〉|《(?<label>[^》]+?)》)/g, meaning);
+  return (result.tag || []).concat(result.label || []);
+}
 
-const extractLinks = (meaning: string) => {
-  const links: string[] = [];
-  const reg = /＝?<?→(?<link>[^>、＝<→■◆【]+)>?/g;
-  let match;
-  while ((match = reg.exec(meaning))) {
-    if (!match[0]) {
-      break;
-    }
-    if (!match.groups) {
-      continue;
-    }
-    const { link } = match.groups;
-    links.push(link);
-  }
-  return links;
-};
+function extractLinks(meaning: string) {
+  return extractRepeat(/＝?<?→(?<link>[^>、＝<→■◆【]+)>?/g, meaning).link;
+}
 
-const parseMeaningPart = (meaningPart: string) => {
+function extractLinkFrom(additionals: Additional[]): string[] {
+  return additionals.reduce<string[]>((array, item) => {
+    if (item.type === "変化") {
+      item.value.split("、").forEach((parts) => {
+        const { value } = extract(/(〈[^〉]+?〉|《[^》]+?》)+(?<value>.*)/, parts);
+        value
+          .split("|")
+          .map((v) => v.trim())
+          .forEach((v) => array.push(v));
+      });
+    } else if (item.type === "略" || item.type === "女性形") {
+      item.value
+        .split(";")
+        .map((v) => v.trim())
+        .forEach((v) => array.push(v));
+    }
+    return array;
+  }, []);
+}
+
+function parseMeaningPart(meaningPart: string) {
   const { text, otherParts } = extractMeaning(meaningPart);
   const tags = extractTags(text);
   const links = extractLinks(text);
   const { remarks, examples, additionals } = extractOther(otherParts);
-  return { text, tags, links, remarks, examples, additionals };
-};
+  const linkFrom: string[] = extractLinkFrom(additionals);
+  return { text, tags, links, remarks, examples, additionals, linkFrom };
+}
 
-const getHolder = (word: string) => {
+function getHolder(word: string) {
   let meanings = dictionary.get(word);
   if (!meanings) {
     meanings = [];
     dictionary.set(word, meanings);
   }
   return meanings;
-};
+}
 
-export const addRow = (row: string) => {
+export function addRow(row: string) {
   row = row.slice(1);
   const index = row.indexOf(":");
   const wordPart = row.slice(0, index).trim();
   const meaningPart = row.slice(index + 1).trim();
   const { word, group, type } = parseWorkdPart(wordPart);
-  const { text, tags, links, remarks, examples, additionals } = parseMeaningPart(meaningPart);
+  const { text, tags, links, remarks, examples, additionals, linkFrom } = parseMeaningPart(meaningPart);
   const meanings = getHolder(word);
   meanings.push({ text, type, group, links, tags, examples, remarks, additionals });
   pushIndex(word, word);
-  additionals.forEach((item) => {
-    if (item.type === "変化") {
-      item.value.split("、").forEach((parts) => {
-        const match = /(〈[^〉]+?〉|《[^》]+?》)+(?<value>.*)/.exec(parts);
-        if (match?.groups) {
-          const { value } = match.groups;
-          value
-            .split("|")
-            .map((v) => v.trim())
-            .forEach((v) => pushIndex(v, word));
-        }
-      });
-    } else if (item.type === "略" || item.type === "女性形") {
-      item.value
-        .split(";")
-        .map((v) => v.trim())
-        .forEach((v) => pushIndex(v, word));
-    }
-  });
-};
+  linkFrom.forEach((item) => pushIndex(item, word));
+}
 
 const pushIndex = (from: string, to: string) => {
   let array = indexes.get(from);
@@ -157,19 +116,19 @@ const pushIndex = (from: string, to: string) => {
   array.add(to);
 };
 
-export const getDictionary = () => {
+export function getDictionary() {
   return dictionary;
-};
+}
 
-export const getIndexes = () => {
+export function getIndexes() {
   return indexes;
-};
+}
 
-export const show = () => {
+export function show() {
   dictionary.forEach((group, word) => {
     group.forEach((a) => {
       console.log(word, a);
     });
   });
   indexes.forEach((words, key) => console.log(key, "→ ", words));
-};
+}
