@@ -6,18 +6,28 @@
   "scripts": {
     "convert": "ts-node src/convert.ts",
     "convert:debug": "node -r ts-node/register --inspect --inspect-brk src/convert.ts",
+    "ref": "ts-node src/ref.ts",
+    "ref:debug": "node -r ts-node/register --inspect --inspect-brk src/ref.ts",
     "analyze": "ts-node src/analyze.ts",
+    "rss": "ts-node src/rss.ts",
     "test": "jest --coverage"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/node-fetch": "^2.5.7",
+    "fs-extra": "^9.0.1",
     "iconv-lite": "^0.6.2",
-    "readline-transform": "^1.0.0"
+    "node-fetch": "^2.6.0",
+    "puppeteer": "^5.2.1",
+    "readline-transform": "^1.0.0",
+    "rss-parser": "^3.9.0"
   },
   "devDependencies": {
+    "@types/fs-extra": "^9.0.1",
     "@types/jest": "^26.0.7",
     "@types/node": "^14.0.23",
+    "@types/puppeteer": "^3.0.1",
     "@types/readline-transform": "^1.0.0",
     "jest": "^26.1.0",
     "ts-jest": "^26.1.3",

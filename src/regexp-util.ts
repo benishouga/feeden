@@ -8,12 +8,12 @@ export function extract(reg: RegExp, text: string) {
     });
     return result;
   }
-  throw new Error("Failed to extract: " + text);
+  throw new Error(`Failed to extract: ${text}, regexp is /${reg.source}/`);
 }
 
 export function extractRepeat(reg: RegExp, text: string) {
   if (!reg.global) {
-    throw new Error("Invalid argument... exp.global is false");
+    throw new Error(`Invalid argument... exp.global is false, /${reg.source}/`);
   }
   const results: { [key: string]: string[] } = {};
   let match;
