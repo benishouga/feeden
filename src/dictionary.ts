@@ -60,10 +60,12 @@ export class Dictionary {
     if (word !== lower) {
       const lowerResult = await this.getOne(lower);
       if (lowerResult) {
-        result.push({ word, meanings: lowerResult });
+        result.push({ word: lower, meanings: lowerResult });
       }
     }
-    const relativeWords = (this.indexes.get(lower) || []).filter((relativeWord) => relativeWord !== word);
+    const relativeWords = (this.indexes.get(lower) || []).filter(
+      (relativeWord) => relativeWord !== word && relativeWord !== lower
+    );
     const resultAll = await Promise.all(
       relativeWords.map(async (word) => ({ word, meanings: await this.getOne(word) } as Result))
     );

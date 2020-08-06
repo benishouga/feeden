@@ -6,9 +6,9 @@ const feeds = ["https://dev.to/feed/"];
 
 (async () => {
   try {
-    console.time("instruction");
+    console.time("construction");
     const dic = new Dictionary("./data/words");
-    console.timeEnd("instruction");
+    console.timeEnd("construction");
     console.time("preload");
     await dic.preload();
     console.timeEnd("preload");
