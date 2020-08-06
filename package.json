@@ -10,6 +10,8 @@
     "ref:debug": "node -r ts-node/register --inspect --inspect-brk src/ref.ts",
     "analyze": "ts-node src/analyze.ts",
     "rss": "ts-node src/rss.ts",
+    "web": "ts-node src/web.ts",
+    "web:debug": "node -r ts-node/register --inspect --inspect-brk src/web.ts",
     "test": "jest --coverage"
   },
   "author": "",

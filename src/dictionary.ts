@@ -148,8 +148,8 @@ export class Dictionary {
       .slice(0, 2)
       .toLowerCase()
       .padEnd(2, "-")
-      .replace(/[-,!.'"()*/&#%+=$ ]/g, "-")
-      .replace(/[^A-Za-z0-9-]/g, "_");
+      .replace(/[-,!.'"()*/&#%+=$ 0-9]/g, "-")
+      .replace(/[^A-Za-z-]/g, "_");
   }
 
   private jsonPath(word: string) {

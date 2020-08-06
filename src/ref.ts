@@ -5,7 +5,7 @@ async function run() {
   // await dic.preload();
   {
     const start = new Date().getTime();
-    const ref = await dic.get(process.argv[2]);
+    const ref = await dic.get(process.argv[2] || "I");
     ref.forEach((e) => console.log(e.meanings.map((m) => `${e.word}: ${JSON.stringify(m)}`).join("\n")));
     console.log("time: ", new Date().getTime() - start);
   }
