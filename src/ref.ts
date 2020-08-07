@@ -1,12 +1,13 @@
-import { Dictionary } from "./dictionary";
+import { Dictionary } from "./dictonary/dictionary";
+import { BASEPATH } from "./config";
 
 async function run() {
-  const dic = new Dictionary("./data/words");
+  const dic = new Dictionary(BASEPATH);
   // await dic.preload();
   {
     const start = new Date().getTime();
-    const ref = await dic.get(process.argv[2] || "I");
-    ref.forEach((e) => console.log(e.meanings.map((m) => `${e.word}: ${JSON.stringify(m)}`).join("\n")));
+    const ref = await dic.lookup(process.argv[2] || "I");
+    ref.forEach((e) => console.log(e.meanings.map((m) => `${e.indexedWord}: ${JSON.stringify(m)}`).join("\n")));
     console.log("time: ", new Date().getTime() - start);
   }
   const memory = process.memoryUsage();

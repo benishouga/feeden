@@ -9,7 +9,7 @@ import { Article } from "./article";
         console.log(`-- ${result.word} --`);
         result.results.forEach((e) => {
           console.log(
-            e.word,
+            e.indexedWord,
             ": ",
             e.meanings
               .map((m) => m.text)
@@ -19,7 +19,9 @@ import { Article } from "./article";
         });
       });
     } finally {
+      console.log("disposing");
       await article.dispose();
+      console.log("diposed");
     }
   } catch (e) {
     console.error(e);

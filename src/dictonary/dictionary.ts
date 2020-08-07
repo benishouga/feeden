@@ -3,7 +3,11 @@ import fsextra from "fs-extra";
 import path from "path";
 import { PassThrough, pipeline as orgPipeline } from "stream";
 import { promisify } from "util";
+import * as iconv from "iconv-lite";
+import ReadlineTransform from "readline-transform";
+
 import { extract, extractRepeat } from "./regexp-util";
+import { LookupResult } from "./lookup-result";
 
 const pipeline = promisify(orgPipeline);
 const mkdir = promisify(fs.mkdir);
@@ -12,15 +16,7 @@ const remove = promisify(fsextra.remove);
 const readFile = promisify(fs.readFile);
 const readdir = promisify(fs.readdir);
 
-import * as iconv from "iconv-lite";
-import ReadlineTransform from "readline-transform";
-
-export interface Result {
-  word: string;
-  meanings: Meaning[];
-}
-
-export interface Meaning {
+export type MeaningRow = {
   group?: string;
   type?: string;
   text?: string;
@@ -29,18 +25,19 @@ export interface Meaning {
   examples?: string[];
   additionals?: Additional[];
   links?: string[];
-}
+};
 
-export interface Additional {
+export type Additional = {
   type: string;
   value: string;
-}
+};
 
 export class Dictionary {
   private converting: boolean = false;
   private loadedSet: Set<string> = new Set();
-  private cache: Map<string, Meaning[]> = new Map();
+  private cache: Map<string, MeaningRow[]> = new Map();
   private indexes: Map<string, string[]> = new Map();
+
   constructor(private basepath: string) {
     try {
       const indexes = readFileSync(path.join(basepath, "_index.json"), "utf-8");
@@ -50,29 +47,41 @@ export class Dictionary {
     }
   }
 
-  public async get(word: string): Promise<Result[]> {
-    let result: Result[] = [];
-    const originalResult = await this.getOne(word);
-    if (originalResult) {
-      result.push({ word, meanings: originalResult });
+  public async lookup(word: string): Promise<LookupResult[]> {
+    let result: LookupResult[] = [];
+    const originalResults = await this.lookupCorrectly(word);
+    if (originalResults) {
+      result.push(new LookupResult(word, originalResults));
     }
     const lower = word.toLowerCase();
     if (word !== lower) {
-      const lowerResult = await this.getOne(lower);
-      if (lowerResult) {
-        result.push({ word: lower, meanings: lowerResult });
+      const lowerResults = await this.lookupCorrectly(lower);
+      if (lowerResults) {
+        result.push(new LookupResult(lower, lowerResults));
       }
     }
     const relativeWords = (this.indexes.get(lower) || []).filter(
       (relativeWord) => relativeWord !== word && relativeWord !== lower
     );
-    const resultAll = await Promise.all(
-      relativeWords.map(async (word) => ({ word, meanings: await this.getOne(word) } as Result))
+    const relativesResults = await Promise.all(
+      relativeWords.map(async (word) => {
+        const results = await this.lookupCorrectly(word);
+        if (!results) {
+          throw new Error("The data is corrupted.");
+        }
+        return new LookupResult(word, results);
+      })
     );
-    return result.concat(resultAll);
+    return result.concat(relativesResults);
   }
 
-  private async getOne(word: string) {
+  async lookupCorrectly(word: string) {
+    const meanings = await this.lookupCorrectlyFromCache(word);
+    // meanings?.forEach((e) => e.links?.map(e => this.));
+    return meanings;
+  }
+
+  private async lookupCorrectlyFromCache(word: string) {
     const path = this.jsonPath(word);
     if (this.loadedSet.has(path)) {
       return this.cache.get(word);
@@ -163,7 +172,7 @@ export class Dictionary {
     }
   }
 
-  private currentDictionary?: Map<string, Meaning[]>;
+  private currentDictionary?: Map<string, MeaningRow[]>;
   private currentPrefix?: string;
   private tempDir?: string;
 

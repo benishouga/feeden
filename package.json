@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "type": "tsc --noEmit",
     "convert": "ts-node src/convert.ts",
     "convert:debug": "node -r ts-node/register --inspect --inspect-brk src/convert.ts",
     "ref": "ts-node src/ref.ts",

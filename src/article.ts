@@ -1,4 +1,4 @@
-import { Dictionary } from "./dictionary";
+import { Dictionary } from "./dictonary/dictionary";
 import { BASEPATH } from "./config";
 import Parser from "rss-parser";
 import Puppeteer, { Browser } from "puppeteer";
@@ -23,7 +23,7 @@ export class Article {
 
   async dispose() {
     this.dic.preload();
-    this.browser?.close();
+    await this.browser?.close();
     return;
   }
 
@@ -37,7 +37,7 @@ export class Article {
     return {
       sentences,
       words,
-      meanings: await Promise.all(words.map(async (word) => ({ word, results: await this.dic.get(word) }))),
+      meanings: await Promise.all(words.map(async (word) => ({ word, results: await this.dic.lookup(word) }))),
     };
   }
 
@@ -51,7 +51,7 @@ export class Article {
     return {
       sentences,
       words,
-      meanings: await Promise.all(words.map(async (word) => ({ word, results: await this.dic.get(word) }))),
+      meanings: await Promise.all(words.map(async (word) => ({ word, results: await this.dic.lookup(word) }))),
     };
   }
 
@@ -70,7 +70,6 @@ export class Article {
   private extractText(text: string): ExtractedResult {
     const sentences = this.extractSentences(text);
     const words = this.extractWords(sentences);
-    console.log(sentences);
     return { sentences, words };
   }
 
