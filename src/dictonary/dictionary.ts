@@ -8,6 +8,7 @@ import ReadlineTransform from "readline-transform";
 
 import { extract, extractRepeat } from "./regexp-util";
 import { LookupResult } from "./lookup-result";
+import { TEMPPATH } from "../config";
 
 const pipeline = promisify(orgPipeline);
 const mkdir = promisify(fs.mkdir);
@@ -82,7 +83,7 @@ export class Dictionary {
   }
 
   private async lookupCorrectlyFromCache(word: string) {
-    const path = this.jsonPath(word);
+    const path = this.getWordFilePath(word);
     if (this.loadedSet.has(path)) {
       return this.cache.get(word);
     }
@@ -106,12 +107,12 @@ export class Dictionary {
   }
 
   public async convertFrom(eijiro: string) {
-    const perline = new ReadlineTransform();
     this.converting = true;
     try {
-      this.tempDir = "./data/temp";
+      this.tempDir = TEMPPATH;
       await mkdir(this.tempDir);
       this.indexes.clear();
+      const perline = new ReadlineTransform();
       await pipeline(
         fs.createReadStream(eijiro),
         iconv.decodeStream("Shift_JIS"),
@@ -119,10 +120,10 @@ export class Dictionary {
         new PassThrough({ objectMode: true }).on("data", async (line) => this.addRow(line))
       );
       if (this.currentPrefix && this.currentDictionary && this.tempDir) {
-        this.dumpDictionary();
+        this.saveDictionaryToTemp();
       }
-      this.dumpIndex();
-      await this.replace();
+      this.saveIndexesToTemp();
+      await this.replaceFiles();
     } finally {
       this.converting = false;
       if (this.tempDir) {
@@ -131,7 +132,7 @@ export class Dictionary {
     }
   }
 
-  private async replace() {
+  private async replaceFiles() {
     this.checkConversion();
     if (!this.tempDir || !this.basepath) {
       throw new Error();
@@ -140,7 +141,7 @@ export class Dictionary {
     await rename(this.tempDir, this.basepath);
   }
 
-  private dumpIndex() {
+  private saveIndexesToTemp() {
     this.checkConversion();
     if (!this.currentPrefix || !this.currentDictionary || !this.tempDir) {
       throw new Error();
@@ -152,7 +153,7 @@ export class Dictionary {
     fs.writeFileSync(path.join(this.tempDir, "_index.json"), JSON.stringify(array));
   }
 
-  private prefix(word: string) {
+  private getWordFilePrefix(word: string) {
     return word
       .slice(0, 2)
       .toLowerCase()
@@ -161,8 +162,8 @@ export class Dictionary {
       .replace(/[^A-Za-z-]/g, "_");
   }
 
-  private jsonPath(word: string) {
-    const prefix = this.prefix(word);
+  private getWordFilePath(word: string) {
+    const prefix = this.getWordFilePrefix(word);
     return `${path.join(this.basepath, prefix)}.json`;
   }
 
@@ -185,10 +186,10 @@ export class Dictionary {
     const { word, group, type } = this.parseWorkdPart(wordPart);
     const { text, tags, links, remarks, examples, additionals, linkFrom } = this.parseMeaningPart(meaningPart);
 
-    const prefix = this.prefix(word);
+    const prefix = this.getWordFilePrefix(word);
     if (this.currentPrefix !== prefix) {
       if (this.currentPrefix && this.currentDictionary && this.tempDir) {
-        this.dumpDictionary();
+        this.saveDictionaryToTemp();
       }
       this.currentDictionary = new Map();
       this.currentPrefix = prefix;
@@ -215,7 +216,7 @@ export class Dictionary {
     return meanings;
   }
 
-  private dumpDictionary() {
+  private saveDictionaryToTemp() {
     this.checkConversion();
     if (!this.currentPrefix || !this.currentDictionary || !this.tempDir) {
       throw new Error();
