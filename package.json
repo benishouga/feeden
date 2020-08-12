@@ -24,7 +24,8 @@
     "node-fetch": "^2.6.0",
     "puppeteer": "^5.2.1",
     "readline-transform": "^1.0.0",
-    "rss-parser": "^3.9.0"
+    "rss-parser": "^3.9.0",
+    "tslib": "^2.0.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",

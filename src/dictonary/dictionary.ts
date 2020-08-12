@@ -9,6 +9,7 @@ import ReadlineTransform from "readline-transform";
 import { extract, extractRepeat } from "./regexp-util";
 import { LookupResult } from "./lookup-result";
 import { TEMPPATH } from "../config";
+import { Queue } from "./queue";
 
 const pipeline = promisify(orgPipeline);
 const mkdir = promisify(fs.mkdir);
@@ -23,9 +24,14 @@ export type MeaningRow = {
   text?: string;
   tags?: string[];
   remarks?: string[];
-  examples?: string[];
+  examples?: Example[];
   additionals?: Additional[];
   links?: string[];
+};
+
+export type Example = {
+  en: string;
+  ja: string;
 };
 
 export type Additional = {
@@ -38,6 +44,7 @@ export class Dictionary {
   private loadedSet: Set<string> = new Set();
   private cache: Map<string, MeaningRow[]> = new Map();
   private indexes: Map<string, string[]> = new Map();
+  private queue: Queue = new Queue();
 
   constructor(private basepath: string) {
     try {
@@ -48,57 +55,6 @@ export class Dictionary {
     }
   }
 
-  public async lookup(word: string): Promise<LookupResult[]> {
-    let result: LookupResult[] = [];
-    const originalResults = await this.lookupCorrectly(word);
-    if (originalResults) {
-      result.push(new LookupResult(word, originalResults));
-    }
-    const lower = word.toLowerCase();
-    if (word !== lower) {
-      const lowerResults = await this.lookupCorrectly(lower);
-      if (lowerResults) {
-        result.push(new LookupResult(lower, lowerResults));
-      }
-    }
-    const relativeWords = (this.indexes.get(lower) || []).filter(
-      (relativeWord) => relativeWord !== word && relativeWord !== lower
-    );
-    const relativesResults = await Promise.all(
-      relativeWords.map(async (word) => {
-        const results = await this.lookupCorrectly(word);
-        if (!results) {
-          throw new Error("The data is corrupted.");
-        }
-        return new LookupResult(word, results);
-      })
-    );
-    return result.concat(relativesResults);
-  }
-
-  async lookupCorrectly(word: string) {
-    const meanings = await this.lookupCorrectlyFromCache(word);
-    // meanings?.forEach((e) => e.links?.map(e => this.));
-    return meanings;
-  }
-
-  private async lookupCorrectlyFromCache(word: string) {
-    const path = this.getWordFilePath(word);
-    if (this.loadedSet.has(path)) {
-      return this.cache.get(word);
-    }
-    await this.load(path);
-    return this.cache.get(word);
-  }
-
-  private async load(path: string) {
-    try {
-      const text = await readFile(path, "utf-8");
-      (JSON.parse(text) as any).forEach(([key, value]: any) => this.cache.set(key, value));
-      this.loadedSet.add(path);
-    } catch {}
-  }
-
   public async preload() {
     const list = await readdir(this.basepath);
     return Promise.all(
@@ -106,7 +62,54 @@ export class Dictionary {
     );
   }
 
+  public lookup(word: string): LookupResult[] {
+    let result: LookupResult[] = [];
+    const originalResults = this.lookupCorrectly(word);
+    if (originalResults) {
+      result.push(new LookupResult(word, originalResults));
+    }
+    const lower = word.toLowerCase();
+    if (word !== lower) {
+      const lowerResults = this.lookupCorrectly(lower);
+      if (lowerResults) {
+        result.push(new LookupResult(lower, lowerResults));
+      }
+    }
+    const relativeWords = (this.indexes.get(lower) || []).filter(
+      (relativeWord) => relativeWord !== word && relativeWord !== lower
+    );
+    const relativesResults = relativeWords.map((word) => {
+      const results = this.lookupCorrectly(word);
+      if (!results) {
+        throw new Error("The data is corrupted.");
+      }
+      return new LookupResult(word, results);
+    });
+    return result.concat(relativesResults);
+  }
+
+  public lookupCorrectly(word: string): MeaningRow[] | undefined {
+    return this.cache.get(word);
+  }
+
+  private async load(path: string) {
+    return new Promise((resolve) => {
+      this.queue.push(async () => {
+        if (this.loadedSet.has(path)) {
+          resolve();
+        }
+        try {
+          const text = await readFile(path, "utf-8");
+          (JSON.parse(text) as any).forEach(([key, value]: any) => this.cache.set(key, value));
+          this.loadedSet.add(path);
+        } catch {}
+        resolve();
+      });
+    });
+  }
+
   public async convertFrom(eijiro: string) {
+    if (this.converting) new Error("It's already in process.");
     this.converting = true;
     try {
       this.tempDir = TEMPPATH;
@@ -247,17 +250,31 @@ export class Dictionary {
     return extract(/^(?<text>[^■◆【]*)(?<otherParts>.*)/, meaningPart);
   }
 
+  private extractExample(example: string) {
+    this.checkConversion();
+    const index = example.search(/(?=[^\x20-\x7E].*$)/);
+    return {
+      en: example.slice(0, index),
+      ja: example.slice(index),
+    };
+  }
+
   private extractOther(other: string) {
     this.checkConversion();
     const extracted = extractRepeat(
       /(?:◆(?<remarks>[^■◆【]+)|■・(?<examples>[^■◆【]+)|◆?(?<additionals>【[^■◆【]+))?/g,
       other
     );
-    const result: { remarks: string[]; examples: string[]; additionals: Additional[] } = {
+    const result: { remarks: string[]; examples: Example[]; additionals: Additional[] } = {
       remarks: extracted.remarks,
-      examples: extracted.examples,
+      examples: [],
       additionals: [],
     };
+
+    extracted.examples?.forEach((example: string) => {
+      result.examples.push(this.extractExample(example));
+    });
+
     extracted.additionals?.forEach((additional: string) => {
       const { type, value } = extract(/【(?<type>[^】]+)】(?<value>.*?)、?$/, additional);
       if (type) result.additionals.push({ type, value });
@@ -297,7 +314,7 @@ export class Dictionary {
     }, []);
   }
 
-  pushIndex(from: string, to: string) {
+  private pushIndex(from: string, to: string) {
     let array = this.indexes.get(from);
     if (!array) {
       array = [];

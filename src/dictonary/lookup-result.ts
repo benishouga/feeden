@@ -9,3 +9,9 @@ export class LookupResult {
     }
   }
 }
+
+class GroupHolder {
+  meaning: Meaning = new Meaning();
+}
+
+class Meaning {}

@@ -16,13 +16,12 @@ export class Article {
   }
 
   async initialize() {
-    this.dic.preload();
+    await this.dic.preload();
     this.browser = await Puppeteer.launch();
     return this;
   }
 
   async dispose() {
-    this.dic.preload();
     await this.browser?.close();
     return;
   }
@@ -33,12 +32,8 @@ export class Article {
       throw new Error("Text not found.");
     }
     const { sentences, words } = this.extractText(text);
-
-    return {
-      sentences,
-      words,
-      meanings: await Promise.all(words.map(async (word) => ({ word, results: await this.dic.lookup(word) }))),
-    };
+    const meanings = await Promise.all(words.map(async (word) => ({ word, results: await this.dic.lookup(word) })));
+    return { sentences, words, meanings };
   }
 
   async web(url: string) {
@@ -47,12 +42,8 @@ export class Article {
       throw new Error("Text not found.");
     }
     const { sentences, words } = this.extractText(text);
-
-    return {
-      sentences,
-      words,
-      meanings: await Promise.all(words.map(async (word) => ({ word, results: await this.dic.lookup(word) }))),
-    };
+    const meanings = await Promise.all(words.map(async (word) => ({ word, results: await this.dic.lookup(word) })));
+    return { sentences, words, meanings };
   }
 
   private async extractWeb(url: string) {
