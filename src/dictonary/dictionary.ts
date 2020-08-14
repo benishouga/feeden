@@ -7,7 +7,7 @@ import * as iconv from "iconv-lite";
 import ReadlineTransform from "readline-transform";
 
 import { extract, extractRepeat } from "./regexp-util";
-import { LookupResult } from "./lookup-result";
+import { Word, createResult } from "./lookup-result";
 import { TEMPPATH } from "../config";
 import { Queue } from "./queue";
 
@@ -62,17 +62,17 @@ export class Dictionary {
     );
   }
 
-  public lookup(word: string): LookupResult[] {
-    let result: LookupResult[] = [];
+  public lookup(word: string): Word[] {
+    let result: Word[] = [];
     const originalResults = this.lookupCorrectly(word);
     if (originalResults) {
-      result.push(new LookupResult(word, originalResults));
+      result.push(createResult(this, word, originalResults));
     }
     const lower = word.toLowerCase();
     if (word !== lower) {
       const lowerResults = this.lookupCorrectly(lower);
       if (lowerResults) {
-        result.push(new LookupResult(lower, lowerResults));
+        result.push(createResult(this, lower, lowerResults));
       }
     }
     const relativeWords = (this.indexes.get(lower) || []).filter(
@@ -83,7 +83,7 @@ export class Dictionary {
       if (!results) {
         throw new Error("The data is corrupted.");
       }
-      return new LookupResult(word, results);
+      return createResult(this, word, results);
     });
     return result.concat(relativesResults);
   }

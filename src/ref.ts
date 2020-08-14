@@ -7,8 +7,8 @@ async function run() {
   await dic.preload();
 
   const ref = await dic.lookup(process.argv[2] || "close");
-  ref.forEach((e) => console.log(e.meanings.map((m) => `${e.indexedWord}: ${JSON.stringify(m)}`).join("\n")));
-
+  // ref.forEach((e) => console.log(e.meanings.map((m) => `${e.indexedWord}: ${JSON.stringify(m)}`).join("\n")));
+  console.log(JSON.stringify(ref, null, "  "));
   showMemory();
 }
 
