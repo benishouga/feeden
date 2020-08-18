@@ -32,10 +32,14 @@ export class Article {
       throw new Error("Text not found.");
     }
     const { sentences, words } = this.extractText(text);
-    const results = await Promise.all(
-      words.map(async (lookupWord) => ({ lookupWord, words: await this.dic.lookup(lookupWord) }))
+    const lookupResults = await Promise.all(
+      words.map(async (lookupWord) => {
+        const lookupResults = await this.dic.lookup(lookupWord);
+        const meta = lookupResults.find((word) => word.meta)?.meta;
+        return { lookupWord, lookupResults, meta };
+      })
     );
-    return { sentences, words, results };
+    return { sentences, words, lookupResults };
   }
 
   async web(url: string) {
@@ -45,7 +49,11 @@ export class Article {
     }
     const { sentences, words } = this.extractText(text);
     const results = await Promise.all(
-      words.map(async (lookupWord) => ({ lookupWord, words: await this.dic.lookup(lookupWord) }))
+      words.map(async (lookupWord) => {
+        const lookupResults = await this.dic.lookup(lookupWord);
+        const meta = lookupResults.find((word) => word.meta)?.meta;
+        return { lookupWord, lookupResults, meta };
+      })
     );
     return { sentences, words, results };
   }

@@ -5,17 +5,13 @@ import { Article } from "./article";
     const article = await new Article().initialize();
     try {
       const rss = await article.rss(process.argv[2] || "https://dev.to/feed/");
-      rss.results
-        .filter((result) => result.words.length)
-        .sort(
-          (a, b) =>
-            (a.words.find((word) => word.meta)?.meta?.level || 1000) -
-            (b.words.find((word) => word.meta)?.meta?.level || 1000)
-        )
+      rss.lookupResults
+        .filter((result) => result.lookupResults.length)
+        .sort((a, b) => (a.meta?.level || 1000) - (b.meta?.level || 1000))
         .slice(0, 50)
         .forEach((result) => {
           console.log(`-- ${result.lookupWord} --`);
-          result.words.forEach((e) => {
+          result.lookupResults.forEach((e) => {
             console.log(
               e.indexedWord,
               ": ",
