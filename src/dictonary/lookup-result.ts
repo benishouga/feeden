@@ -14,7 +14,7 @@ export function createResult(dic: Dictionary, indexedWord: string, meaningRows: 
     indexedWord,
     meanings,
     groups: Object.keys(groups)
-      .filter((key) => key)
+      .filter((key) => key) // exclude groups[""]
       .sort((a, b) => Number(a) - Number(b))
       .map((key) => ({
         meta: extractMeta(groups[key]) || meta,

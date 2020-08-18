@@ -9,7 +9,6 @@ import ReadlineTransform from "readline-transform";
 import { extract, extractRepeat } from "./regexp-util";
 import { Word, createResult } from "./lookup-result";
 import { TEMPPATH } from "../config";
-import { Queue } from "./queue";
 
 const pipeline = promisify(orgPipeline);
 const mkdir = promisify(fs.mkdir);
@@ -44,7 +43,6 @@ export class Dictionary {
   private loadedSet: Set<string> = new Set();
   private cache: Map<string, MeaningRow[]> = new Map();
   private indexes: Map<string, string[]> = new Map();
-  private queue: Queue = new Queue();
 
   constructor(private basepath: string) {
     try {
@@ -58,7 +56,14 @@ export class Dictionary {
   public async preload() {
     const list = await readdir(this.basepath);
     return Promise.all(
-      list.filter((file) => file !== "_index.json").map(async (file) => this.load(path.join(this.basepath, file)))
+      list
+        .filter((file) => file !== "_index.json")
+        .map(async (file) => {
+          const filePath = path.join(this.basepath, file);
+          const text = await readFile(filePath, "utf-8");
+          (JSON.parse(text) as any).forEach(([key, value]: any) => this.cache.set(key, value));
+          this.loadedSet.add(filePath);
+        })
     );
   }
 
@@ -90,22 +95,6 @@ export class Dictionary {
 
   public lookupCorrectly(word: string): MeaningRow[] | undefined {
     return this.cache.get(word);
-  }
-
-  private async load(path: string) {
-    return new Promise((resolve) => {
-      this.queue.push(async () => {
-        if (this.loadedSet.has(path)) {
-          resolve();
-        }
-        try {
-          const text = await readFile(path, "utf-8");
-          (JSON.parse(text) as any).forEach(([key, value]: any) => this.cache.set(key, value));
-          this.loadedSet.add(path);
-        } catch {}
-        resolve();
-      });
-    });
   }
 
   public async convertFrom(eijiro: string) {
