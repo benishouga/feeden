@@ -1,6 +1,6 @@
-import { Dictionary } from "./dictonary/dictionary";
-import { BASEPATH } from "./config";
-import { showMemory } from "./monitoring";
+import { Dictionary } from "../lib/dictionary";
+import { BASEPATH } from "../config";
+import { showMemory } from "../lib/monitoring";
 
 async function run() {
   const dic = new Dictionary(BASEPATH);

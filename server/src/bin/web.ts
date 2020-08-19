@@ -1,11 +1,13 @@
-import { Article } from "./article";
-import { Word } from "./dictonary/lookup-result";
+import { Article } from "../lib/article";
+import { showMemory } from "../lib/monitoring";
 
 (async () => {
   try {
+    console.time("web");
     const article = await new Article().initialize();
     try {
       const web = await article.web(process.argv[2] || "https://fettblog.eu/typescript-react-component-patterns/");
+      console.timeEnd("web");
       web.results
         .filter((result) => result.lookupResults.length)
         .sort((a, b) => (a.meta?.level || 1000) - (b.meta?.level || 1000))
@@ -38,6 +40,7 @@ import { Word } from "./dictonary/lookup-result";
       await article.dispose();
       console.log("diposed");
     }
+    showMemory();
   } catch (e) {
     console.error(e);
   }

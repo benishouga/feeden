@@ -1,10 +1,13 @@
-import { Article } from "./article";
+import { Article } from "../lib/article";
+import { showMemory } from "../lib/monitoring";
 
 (async () => {
   try {
+    console.time("rss");
     const article = await new Article().initialize();
     try {
       const rss = await article.rss(process.argv[2] || "https://dev.to/feed/");
+      console.timeEnd("rss");
       rss.lookupResults
         .filter((result) => result.lookupResults.length)
         .sort((a, b) => (a.meta?.level || 1000) - (b.meta?.level || 1000))
@@ -37,6 +40,7 @@ import { Article } from "./article";
       await article.dispose();
       console.log("diposed");
     }
+    showMemory();
   } catch (e) {
     console.error(e);
   }

@@ -1,7 +1,8 @@
-import { Dictionary } from "./dictonary/dictionary";
-import { BASEPATH } from "./config";
 import Parser from "rss-parser";
 import Puppeteer, { Browser } from "puppeteer";
+
+import { Dictionary } from "./dictionary";
+import { BASEPATH } from "../config";
 
 type ExtractedResult = { sentences: string[]; words: string[] };
 
